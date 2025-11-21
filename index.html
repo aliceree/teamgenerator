@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alice's Team Generator</title>
+    <!-- Připravím neon styl podobný ukázce: černé pozadí, růžový digitální text -->
+    <style>
+      :root {
+        --bg: #050505;
+        --glow: #ff4ddb;
+        --glow-strong: #ff66e8;
+        --text: #f8d9ff;
+        --muted: #bba3c6;
+        --panel: rgba(255, 77, 219, 0.05);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Share Tech Mono", "Fira Code", "SFMono-Regular", monospace;
+        background: radial-gradient(circle at 50% 30%, #140014 0%, #000 55%, #000 100%);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+      }
+
+      main {
+        width: min(780px, 92vw);
+      }
+
+      .screen {
+        display: none;
+        padding: 32px 26px;
+        border: 1px solid rgba(255, 77, 219, 0.2);
+        border-radius: 20px;
+        background: linear-gradient(160deg, rgba(255, 77, 219, 0.06), rgba(0, 0, 0, 0.8));
+        box-shadow: 0 0 32px rgba(255, 77, 219, 0.2), inset 0 0 24px rgba(255, 77, 219, 0.08);
+      }
+
+      .screen.active {
+        display: block;
+      }
+
+      h1 {
+        margin: 0 0 18px;
+        font-size: clamp(30px, 4vw, 44px);
+        letter-spacing: 0.06em;
+        color: var(--glow);
+        text-shadow: 0 0 10px rgba(255, 77, 219, 0.8), 0 0 30px rgba(255, 77, 219, 0.5);
+      }
+
+      p.lead {
+        margin: 0 0 18px;
+        color: var(--muted);
+        letter-spacing: 0.03em;
+      }
+
+      form {
+        display: grid;
+        gap: 16px;
+      }
+
+      label {
+        font-size: 13px;
+        text-transform: uppercase;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+      }
+
+      input {
+        width: 100%;
+        background: rgba(255, 77, 219, 0.04);
+        border: 1px solid rgba(255, 77, 219, 0.35);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 16px;
+        color: var(--text);
+        letter-spacing: 0.04em;
+        outline: none;
+        box-shadow: 0 0 12px rgba(255, 77, 219, 0.2);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      }
+
+      input:focus {
+        border-color: var(--glow-strong);
+        box-shadow: 0 0 18px rgba(255, 77, 219, 0.6), 0 0 48px rgba(255, 77, 219, 0.2);
+        transform: translateY(-1px);
+      }
+
+      button {
+        justify-self: start;
+        border: 1px solid rgba(255, 77, 219, 0.7);
+        background: radial-gradient(circle at 20% 20%, rgba(255, 77, 219, 0.5), rgba(255, 77, 219, 0.12));
+        color: var(--text);
+        padding: 14px 18px;
+        border-radius: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        box-shadow: 0 0 18px rgba(255, 77, 219, 0.45);
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0 28px rgba(255, 77, 219, 0.7);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .hint {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+
+      .teams {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .team {
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: var(--panel);
+        border: 1px solid rgba(255, 77, 219, 0.25);
+        color: var(--text);
+        text-shadow: 0 0 10px rgba(255, 77, 219, 0.35);
+        letter-spacing: 0.04em;
+      }
+
+      .team strong {
+        color: var(--glow);
+        text-shadow: 0 0 10px rgba(255, 77, 219, 0.7);
+      }
+
+      .enter-prompt {
+        margin-top: 14px;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <!-- Úvodní obrazovka: zadání jmen a velikosti týmu -->
+      <section class="screen active" id="intro-screen">
+        <h1>Alice's Team Generator</h1>
+        <p class="lead">Digitální neon look, stiskni Enter pro start.</p>
+        <form id="team-form">
+          <div>
+            <label for="names">Jména členů</label>
+            <input
+              id="names"
+              name="names"
+              type="text"
+              placeholder="Alice, Bob, Carol, Dave"
+              autocomplete="off"
+              required
+            />
+            <div class="hint">Odděluj čárkou. Enter = pokračovat.</div>
+          </div>
+          <div>
+            <label for="team-size">Velikost týmu</label>
+            <input
+              id="team-size"
+              name="teamSize"
+              type="number"
+              min="1"
+              value="2"
+              required
+            />
+            <div class="hint">Zadej počet členů v jednom týmu.</div>
+          </div>
+          <button type="submit">Vytvořit týmy</button>
+        </form>
+      </section>
+
+      <!-- Druhá obrazovka: zobrazení rozdělených týmů -->
+      <section class="screen" id="results-screen" aria-live="polite">
+        <h1>Rozdělené týmy</h1>
+        <p class="lead">Enter znovu = náhodně přelosuje členy.</p>
+        <div id="teams" class="teams"></div>
+        <div class="enter-prompt">Stiskni Enter pro nové rozdělení.</div>
+      </section>
+    </main>
+
+    <script>
+      // Najdu důležité prvky
+      const introScreen = document.getElementById("intro-screen");
+      const resultsScreen = document.getElementById("results-screen");
+      const form = document.getElementById("team-form");
+      const teamsList = document.getElementById("teams");
+      const namesInput = document.getElementById("names");
+      const sizeInput = document.getElementById("team-size");
+
+      let currentScreen = "intro";
+      let state = {
+        names: [],
+        teamSize: 2,
+      };
+
+      // Přepínač obrazovek (intro -> results)
+      const showScreen = (name) => {
+        currentScreen = name;
+        introScreen.classList.toggle("active", name === "intro");
+        resultsScreen.classList.toggle("active", name === "results");
+      };
+
+      // Zamíchám pole pomocí Fisher-Yates
+      const shuffle = (arr) => {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      };
+
+      // Rozdělím do týmů a vykreslím na results screen
+      const renderTeams = () => {
+        teamsList.innerHTML = "";
+        const shuffled = shuffle(state.names);
+        let teamIndex = 1;
+
+        for (let i = 0; i < shuffled.length; i += state.teamSize) {
+          const members = shuffled.slice(i, i + state.teamSize);
+          const team = document.createElement("div");
+          team.className = "team";
+          team.innerHTML = `<strong>Tým ${teamIndex}</strong> — ${members.join(", ")}`;
+          teamsList.appendChild(team);
+          teamIndex += 1;
+        }
+      };
+
+      // Předám submit formuláře, uložím stav a přepnu na results
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const rawNames = namesInput.value
+          .split(/[,\n]/)
+          .map((name) => name.trim())
+          .filter(Boolean);
+        const teamSize = Number(sizeInput.value);
+
+        if (!rawNames.length || !teamSize || teamSize < 1) {
+          namesInput.focus();
+          return;
+        }
+
+        state = {
+          names: rawNames,
+          teamSize,
+        };
+
+        renderTeams();
+        showScreen("results");
+      });
+
+      // Ošetřím Enter: na úvodu odesílá, na výsledcích přelosuje
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter") return;
+
+        if (currentScreen === "intro") {
+          event.preventDefault();
+          form.requestSubmit();
+        } else if (currentScreen === "results") {
+          event.preventDefault();
+          renderTeams();
+        }
+      });
+
+      // Zajistím, že input pro jména je okamžitě aktivní
+      namesInput.focus();
+    </script>
+  </body>
+</html>
