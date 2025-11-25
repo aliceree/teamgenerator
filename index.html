@@ -9,7 +9,7 @@
       :root {
         --bg: #050505;
         --glow: #ff4ddb;
-        --glow-strong: #ff66e8;
+
         --text: #f8d9ff;
         --muted: #bba3c6;
         --panel: rgba(255, 77, 219, 0.05);
@@ -36,7 +36,7 @@
       .screen {
         display: none;
         padding: 32px 26px;
-        border: 1px solid rgba(255, 77, 219, 0.2);
+        border: none;
         border-radius: 20px;
         background: linear-gradient(160deg, rgba(255, 77, 219, 0.06), rgba(0, 0, 0, 0.8));
         box-shadow: 0 0 32px rgba(255, 77, 219, 0.2), inset 0 0 24px rgba(255, 77, 219, 0.08);
@@ -86,6 +86,28 @@
         border-color: var(--glow-strong);
         box-shadow: 0 0 18px rgba(255, 77, 219, 0.6), 0 0 48px rgba(255, 77, 219, 0.2);
         transform: translateY(-1px);
+      }
+
+      /* Vstup pro počet členů inline bez rámečku */
+      .inline-field {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .inline-field input {
+        width: 80px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 6px 0;
+      }
+
+      .inline-field input:focus {
+        border: none;
+        box-shadow: 0 2px 0 rgba(255, 77, 219, 0.8);
+        transform: none;
       }
 
       button {
@@ -145,8 +167,18 @@
     <main>
       <!-- Úvodní obrazovka: zadání jmen a velikosti týmu -->
       <section class="screen active" id="intro-screen">
-        <h1>Alice's Team Generator</h1>
         <form id="team-form">
+          <div class="inline-field">
+            <label for="team-size">Počet členů týmu:</label>
+            <input
+              id="team-size"
+              name="teamSize"
+              type="number"
+              min="1"
+              value="2"
+              required
+            />
+          </div>
           <div>
             <label for="names">Jména členů:</label>
             <textarea
@@ -158,18 +190,6 @@
               required
             ></textarea>
           </div>
-          <div>
-            <label for="team-size">Počet členů týmu:</label>
-            <input
-              id="team-size"
-              name="teamSize"
-              type="number"
-              min="1"
-              value="2"
-              required
-            />
-          </div>
-          <button type="submit" aria-label="Potvrdit a zobrazit týmy">Enter</button>
         </form>
       </section>
 
@@ -286,8 +306,8 @@
         }
       });
 
-      // Zajistím, že input pro jména je okamžitě aktivní
-      namesInput.focus();
+      // Zajistím, že jako první je aktivní vstup pro počet členů
+      sizeInput.focus();
     </script>
   </body>
 </html>
