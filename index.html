@@ -54,12 +54,6 @@
         text-shadow: 0 0 10px rgba(255, 77, 219, 0.8), 0 0 30px rgba(255, 77, 219, 0.5);
       }
 
-      p.lead {
-        margin: 0 0 18px;
-        color: var(--muted);
-        letter-spacing: 0.03em;
-      }
-
       form {
         display: grid;
         gap: 16px;
@@ -72,7 +66,8 @@
         letter-spacing: 0.08em;
       }
 
-      input {
+      input,
+      textarea {
         width: 100%;
         background: rgba(255, 77, 219, 0.04);
         border: 1px solid rgba(255, 77, 219, 0.35);
@@ -86,7 +81,8 @@
         transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
       }
 
-      input:focus {
+      input:focus,
+      textarea:focus {
         border-color: var(--glow-strong);
         box-shadow: 0 0 18px rgba(255, 77, 219, 0.6), 0 0 48px rgba(255, 77, 219, 0.2);
         transform: translateY(-1px);
@@ -116,10 +112,7 @@
       }
 
       .hint {
-        margin-top: 6px;
-        font-size: 12px;
-        color: var(--muted);
-        letter-spacing: 0.02em;
+        display: none;
       }
 
       .teams {
@@ -144,10 +137,7 @@
       }
 
       .enter-prompt {
-        margin-top: 14px;
-        color: var(--muted);
-        letter-spacing: 0.08em;
-        font-size: 14px;
+        display: none;
       }
     </style>
   </head>
@@ -156,22 +146,20 @@
       <!-- Úvodní obrazovka: zadání jmen a velikosti týmu -->
       <section class="screen active" id="intro-screen">
         <h1>Alice's Team Generator</h1>
-        <p class="lead">Digitální neon look, stiskni Enter pro start.</p>
         <form id="team-form">
           <div>
-            <label for="names">Jména členů</label>
-            <input
+            <label for="names">Jména členů:</label>
+            <textarea
               id="names"
               name="names"
-              type="text"
-              placeholder="Alice, Bob, Carol, Dave"
+              rows="4"
+              placeholder="Alice&#10;Bob&#10;Carol&#10;Dave"
               autocomplete="off"
               required
-            />
-            <div class="hint">Odděluj čárkou. Enter = pokračovat.</div>
+            ></textarea>
           </div>
           <div>
-            <label for="team-size">Velikost týmu</label>
+            <label for="team-size">Počet členů týmu:</label>
             <input
               id="team-size"
               name="teamSize"
@@ -180,18 +168,15 @@
               value="2"
               required
             />
-            <div class="hint">Zadej počet členů v jednom týmu.</div>
           </div>
-          <button type="submit">Vytvořit týmy</button>
+          <button type="submit" aria-label="Potvrdit a zobrazit týmy">Enter</button>
         </form>
       </section>
 
       <!-- Druhá obrazovka: zobrazení rozdělených týmů -->
       <section class="screen" id="results-screen" aria-live="polite">
         <h1>Rozdělené týmy</h1>
-        <p class="lead">Enter znovu = náhodně přelosuje členy.</p>
         <div id="teams" class="teams"></div>
-        <div class="enter-prompt">Stiskni Enter pro nové rozdělení.</div>
       </section>
     </main>
 
@@ -231,16 +216,38 @@
       const renderTeams = () => {
         teamsList.innerHTML = "";
         const shuffled = shuffle(state.names);
-        let teamIndex = 1;
+        const baseSize = Math.max(1, state.teamSize);
+        const teamCount = Math.floor(shuffled.length / baseSize);
+        const remainder = shuffled.length % baseSize;
 
-        for (let i = 0; i < shuffled.length; i += state.teamSize) {
-          const members = shuffled.slice(i, i + state.teamSize);
+        let teams = [];
+        let cursor = 0;
+
+        // Vytvořím plné týmy základní velikosti
+        for (let i = 0; i < teamCount; i += 1) {
+          teams.push(shuffled.slice(cursor, cursor + baseSize));
+          cursor += baseSize;
+        }
+
+        const leftover = shuffled.slice(cursor);
+
+        // Pokud zbydou členové a existuje aspoň jeden plný tým,
+        // rozdistribuuji je rovnoměrně, aby nezůstal malý tým
+        if (remainder > 0 && teamCount > 0) {
+          leftover.forEach((member, idx) => {
+            teams[idx % teams.length].push(member);
+          });
+        } else if (teamCount === 0 && leftover.length) {
+          // Pokud je lidí méně než velikost týmu, nechám jeden tým se všemi
+          teams = [leftover];
+        }
+
+        teams.forEach((members, index) => {
           const team = document.createElement("div");
           team.className = "team";
-          team.innerHTML = `<strong>Tým ${teamIndex}</strong> — ${members.join(", ")}`;
+          team.innerHTML = `<strong>Tým ${index + 1}</strong> — ${members.join(", ")}`;
           teamsList.appendChild(team);
-          teamIndex += 1;
-        }
+        });
       };
 
       // Předám submit formuláře, uložím stav a přepnu na results
