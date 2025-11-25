@@ -9,7 +9,7 @@
       :root {
         --bg: #050505;
         --glow: #ff4ddb;
-
+        
         --text: #f8d9ff;
         --muted: #bba3c6;
         --panel: rgba(255, 77, 219, 0.05);
@@ -106,8 +106,37 @@
 
       .inline-field input:focus {
         border: none;
-        box-shadow: 0 2px 0 rgba(255, 77, 219, 0.8);
+        box-shadow: none;
         transform: none;
+        outline: none;
+      }
+
+      .inline-field textarea {
+        flex: 1;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 6px 0;
+        resize: none;
+        min-height: 26px;
+      }
+
+      .inline-field textarea:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+        transform: none;
+      }
+
+      /* Schovám spinner u number inputu, psaní bude ruční */
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
       }
 
       button {
@@ -179,13 +208,13 @@
               required
             />
           </div>
-          <div>
+          <div class="inline-field">
             <label for="names">Jména členů:</label>
             <textarea
               id="names"
               name="names"
-              rows="4"
-              placeholder="Alice&#10;Bob&#10;Carol&#10;Dave"
+              rows="1"
+              placeholder="Alice, Bob, Carol, Dave"
               autocomplete="off"
               required
             ></textarea>
@@ -306,8 +335,8 @@
         }
       });
 
-      // Zajistím, že jako první je aktivní vstup pro počet členů
-      sizeInput.focus();
+      // Zajistím, že jako první je aktivní vstup pro jména
+      namesInput.focus();
     </script>
   </body>
 </html>
