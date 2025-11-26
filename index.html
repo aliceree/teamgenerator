@@ -9,9 +9,9 @@
       :root {
         --bg: #050505;
         --glow: #ff4ddb;
-        
-        --text: #f8d9ff;
-        --muted: #bba3c6;
+        --glow-strong: #ff66e8;
+        --text: #ffffff;
+        --muted: #ffffff;
         --panel: rgba(255, 77, 219, 0.05);
       }
 
@@ -38,8 +38,8 @@
         padding: 32px 26px;
         border: none;
         border-radius: 0;
-        background: linear-gradient(160deg, rgba(255, 77, 219, 0.06), rgba(0, 0, 0, 0.8));
-        box-shadow: 0 0 32px rgba(255, 77, 219, 0.2), inset 0 0 24px rgba(255, 77, 219, 0.08);
+        background: transparent;
+        box-shadow: none;
       }
 
       .screen.active {
@@ -50,24 +50,26 @@
         margin: 0 0 18px;
         font-size: clamp(30px, 4vw, 44px);
         letter-spacing: 0.06em;
-        color: var(--glow);
-        text-shadow: 0 0 10px rgba(255, 77, 219, 0.8), 0 0 30px rgba(255, 77, 219, 0.5);
+        color: var(--text);
+        text-shadow: none;
       }
 
       form {
         display: grid;
         gap: 16px;
+        font-family: inherit;
       }
 
       label {
-        font-size: 13px;
-        text-transform: uppercase;
+        font-size: 16px;
         color: var(--muted);
         letter-spacing: 0.08em;
+        font-family: inherit;
       }
 
       input,
       textarea {
+        font-family: inherit;
         width: 100%;
         background: rgba(255, 77, 219, 0.04);
         border: 1px solid rgba(255, 77, 219, 0.35);
@@ -114,6 +116,7 @@
 
       .inline-field textarea {
         flex: 1;
+        font-family: inherit;
         background: transparent;
         border: none;
         box-shadow: none;
@@ -134,13 +137,17 @@
 
       /* Schovám spinner u number inputu, psaní bude ruční */
       input[type="number"] {
-        -moz-appearance: textfield;
+        appearance: textfield;
       }
 
       input[type="number"]::-webkit-inner-spin-button,
       input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
+      }
+
+      ::placeholder {
+        color: rgba(255, 255, 255, 0.7);
       }
 
       button {
@@ -174,6 +181,7 @@
         display: grid;
         gap: 10px;
         margin-top: 18px;
+        justify-items: center;
       }
 
       .team {
@@ -184,11 +192,13 @@
         color: var(--text);
         text-shadow: 0 0 10px rgba(255, 77, 219, 0.35);
         letter-spacing: 0.04em;
+        text-align: center;
+        width: auto;
       }
 
       .team strong {
-        color: var(--glow);
-        text-shadow: 0 0 10px rgba(255, 77, 219, 0.7);
+        color: var(--text);
+        text-shadow: none;
       }
 
       .enter-prompt {
@@ -228,7 +238,6 @@
 
       <!-- Druhá obrazovka: zobrazení rozdělených týmů -->
       <section class="screen" id="results-screen" aria-live="polite">
-        <h1>Rozdělené týmy</h1>
         <div id="teams" class="teams"></div>
       </section>
     </main>
@@ -298,8 +307,18 @@
         teams.forEach((members, index) => {
           const team = document.createElement("div");
           team.className = "team";
-          team.innerHTML = `<strong>Tým ${index + 1}</strong> — ${members.join(", ")}`;
+          team.textContent = members.join(", ");
           teamsList.appendChild(team);
+        });
+
+        // Nastavím jednotnou šířku podle nejdelšího týmu
+        const teamNodes = Array.from(teamsList.children);
+        const maxWidth = teamNodes.reduce(
+          (acc, node) => Math.max(acc, node.scrollWidth),
+          0
+        );
+        teamNodes.forEach((node) => {
+          node.style.width = maxWidth ? `${maxWidth}px` : "auto";
         });
       };
 
